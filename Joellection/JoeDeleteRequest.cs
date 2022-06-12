@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Joellection
 {
-    public class JoeEntry
+    public class JoeDeleteRequest
     {
-        public string Name;
-        public string Description;
-        public string ImageLink;
         public string JoeID;
     }
 }

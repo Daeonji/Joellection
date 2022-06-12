@@ -10,24 +10,21 @@ using Newtonsoft.Json;
 
 namespace Joellection
 {
-    public static class FindJoe
+    public static class DeleteJoe
     {
-        [FunctionName("FindJoe")]
+        [FunctionName("DeleteJoe")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("Uploading Joe");
-
-            // test change big joe
+            log.LogInformation("C# HTTP trigger function processed a request.");
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var data = JsonConvert.DeserializeObject<JoeRequest>(requestBody);
-            log.LogInformation($"Attempting upload of {requestBody}");
+            var data = JsonConvert.DeserializeObject<JoeEntry>(requestBody);
+            log.LogInformation($"deleting {requestBody}");
+            var response = await BlobStorageService.DeleteJoe(data, log);
 
-            await BlobStorageService.UpdateJoellection(data, log);
-
-            return new OkObjectResult(await BlobStorageService.GetJoellection(log));
+            return new OkObjectResult(response);
         }
     }
 }

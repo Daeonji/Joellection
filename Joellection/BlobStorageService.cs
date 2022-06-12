@@ -58,12 +58,14 @@ namespace Joellection
 
         public static async Task UpdateJoellection(JoeRequest req, ILogger log)
         {
+            Random rnd = new Random();
             var currentCollection = await GetJoellection(log);
 
             var updateRequest = new JoeEntry();
             updateRequest.Name = req.Name;
             updateRequest.Description = req.Description;
             updateRequest.ImageLink = req.ImageLink;
+            updateRequest.JoeID = rnd.Next(200000).ToString();
 
 
             currentCollection.Add(updateRequest);
@@ -74,6 +76,32 @@ namespace Joellection
             var request = JsonConvert.SerializeObject(currentCollection);
             await blobClient.UploadAsync(new MemoryStream(Encoding.UTF8.GetBytes(request)), true);
 
+        }
+
+        public static async Task<bool> DeleteJoe(JoeEntry req, ILogger log)
+        {
+            try
+            {
+                var currentCollection = await GetJoellection(log);
+                log.LogInformation($"Current Collection: {currentCollection.Count}");
+                
+                
+
+
+                var itemToRemove = currentCollection.Single(r => r.JoeID == req.JoeID);
+                currentCollection.Remove(itemToRemove);
+                log.LogInformation($"Current Collection now: {currentCollection.Count}");
+
+                BlobContainerClient blobContainerClient = new BlobContainerClient("UseDevelopmentStorage=true", "test");
+
+                BlobClient blobClient = blobContainerClient.GetBlobClient("joellection");
+                var request = JsonConvert.SerializeObject(currentCollection);
+                await blobClient.UploadAsync(new MemoryStream(Encoding.UTF8.GetBytes(request)), true);
+                return true;
+            }catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }
